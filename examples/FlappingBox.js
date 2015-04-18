@@ -3,7 +3,7 @@ var ctx = c.getContext("2d");
 
 var runSpeed = 3;
 var score = 0, alive = true, restart = false, id = 0, highScore = 0;
-var backGround = new imageData(0,0,c.width,c.height,"res/Sprites/backGround.png","useless");
+var backGround = new rectMngr(0,0,c.width,c.height,"#555","useless");
 var ground = new rectMngr(0,c.height - 20,c.width, 20,"#444","ground");
 var flapper = new rectMngr(c.width/5*2,c.height/2,40,40,"#700","p1");
 var objects = [], tubeX = 685, tubeHeight, tubeY;
