@@ -1,6 +1,9 @@
+/*
+	Author Silas Rex
+	didnt keep track of versions :P
+*/
 function drawString(string,font,x,y,color){
     ctx.fillStyle = color;
-    //"30px Arial"
     ctx.font = font;
     ctx.fillText(string,x,y);
 }
@@ -17,6 +20,7 @@ function rectMngr(x,y,width,height,color,id){
     this.down = false;
     this.right = false;
     this.up = false;
+    this.deg = 0;
 }
 function imageData(x,y,width,height,src,id){
     this.type = "image";
@@ -33,6 +37,7 @@ function imageData(x,y,width,height,src,id){
     this.down = false;
     this.right = false;
     this.up = false;
+    this.deg = 0;
 }
 function animationData(x,y,width,height,IW,IH,src,id){
     this.type = "animation";
@@ -53,36 +58,69 @@ function animationData(x,y,width,height,IW,IH,src,id){
     this.down = false;
     this.right = false;
     this.up = false;
+    this.deg = 0;
+}
+function drawNormalImage(data){
+    ctx.drawImage(data.sprite,
+        data.x,
+        data.y,
+        data.width,
+        data.height);
+}
+function drawNormalRect(data){
+    ctx.fillStyle = data.color;
+    ctx.fillRect(data.x,data.y,data.width,data.height);
+}
+function drawAnimatedImage(data){
+    ctx.drawImage(data.sprite,
+        data.clipStartX,
+        data.clipStartY,
+        data.clipToX,
+        data.clipToY,
+        data.x,
+        data.y,
+        data.width,
+        data.height);
+}
+function imageRotate(rect,deg,drawFun){
+    var rad = deg * Math.PI / 180;
+    var deltaX = rect.x + rect.width/2,
+        deltaY = rect.y + rect.height/2;
+    rect.tempX = rect.x;
+    rect.tempY = rect.y;
+    rect.x = -rect.width/2;
+    rect.y = -rect.height/2;
+    ctx.save();
+    ctx.translate(deltaX,deltaY);
+    ctx.rotate(rad);
+
+    drawFun(rect);
+
+    ctx.translate(-deltaX,-deltaY);
+    ctx.restore();
+    if(rect.tempX != rect.x){
+        rect.x = rect.tempX;
+    }
+    if(rect.tempY != rect.y){
+        rect.y = rect.tempY;
+    }
 }
 function imageShow(data){
     if(data.visible){
         if(data.type === "image"){
-            ctx.drawImage(data.sprite,
-                data.x,
-                data.y,
-                data.width,
-                data.height);
+            imageRotate(data,data.deg,drawNormalImage);
         }
         else if(data.type === "animation"){
-            ctx.drawImage(data.sprite,
-                data.clipStartX,
-                data.clipStartY,
-                data.clipToX,
-                data.clipToY,
-                data.x,
-                data.y,
-                data.width,
-                data.height);
+            imageRotate(data,data.deg,drawAnimatedImage);
         }
         else if(data.type === "rect"){
-            ctx.fillStyle = data.color;
-            ctx.fillRect(data.x,data.y,data.width,data.height);
+            imageRotate(data,data.deg,drawNormalRect);
         }
     }
 }
 function itemsShow(items){
     for (var i = 0; i < items.length; i++) {
-        imageShow(items[i]);
+    	imageShow(items[i]);
     };
 }
 function collisionCheck(r1, r2){
@@ -134,7 +172,7 @@ function worldCol(rect,type){
     if(type === "loop"){
         if(rect.x + rect.width <= 0){
             rect.x = c.width - 1;
-        } 
+        }
         if(rect.x >= c.width){
             rect.x = 0 - rect.width;
         }
