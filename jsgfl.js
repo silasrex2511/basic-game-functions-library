@@ -7,6 +7,34 @@ function drawString(string,font,x,y,color){
     ctx.font = font;
     ctx.fillText(string,x,y);
 }
+function point(x, y){
+    this.x = x;
+    this.y = y;
+    this.width = 0;
+    this.height = 0;
+}
+function line(initX,initY,finalX,finalY){
+    this.xi = initX;
+    this.xf = finalX;
+    this.yi = initY;
+    this.yf = finalY;
+    this.xDelta = this.xf - this.xi;
+    this.yDelta = this.yf - this.yi;
+    this.lineLength = Math.sqrt(Math.pow(this.xDelta,2) + Math.pow(this.yDelta,2));
+    this.linePoints = [];
+    for(var i = 0; i < Math.floor(this.lineLength); i++){
+        this.linePoints[i] = new point((this.xi + (this.xDelta / this.lineLength * i)),(this.yi + (this.yDelta / this.lineLength * i)));
+    }
+}//draws all lines not a specific line
+//needs to be reworked
+function drawLine(line,width,color){
+    ctx.strokeStyle = color;
+    ctx.lineWidth = width;
+    ctx.beginPath();
+    ctx.moveTo(line.xi,line.yi);
+    ctx.lineTo(line.xf,line.yf);
+    ctx.stroke();
+}
 function rectMngr(x,y,width,height,color,id){
     this.type = "rect";
     this.id = id;
@@ -82,7 +110,7 @@ function drawAnimatedImage(data){
         data.width,
         data.height);
 }
-function imageRotate(rect,deg,drawFun){
+function imageCenterRotate(rect,deg,drawFun){
     var rad = deg * Math.PI / 180;
     var deltaX = rect.x + rect.width/2,
         deltaY = rect.y + rect.height/2;
@@ -105,16 +133,17 @@ function imageRotate(rect,deg,drawFun){
         rect.y = rect.tempY;
     }
 }
+//function imageCustomRotate(){}
 function imageShow(data){
     if(data.visible){
         if(data.type === "image"){
-            imageRotate(data,data.deg,drawNormalImage);
+            imageCenterRotate(data,data.deg,drawNormalImage);
         }
         else if(data.type === "animation"){
-            imageRotate(data,data.deg,drawAnimatedImage);
+            imageCenterRotate(data,data.deg,drawAnimatedImage);
         }
         else if(data.type === "rect"){
-            imageRotate(data,data.deg,drawNormalRect);
+            imageCenterRotate(data,data.deg,drawNormalRect);
         }
     }
 }
@@ -165,6 +194,13 @@ function collisionRight(r1, r2){
             return true;
         }else{
             false;
+        }
+    }
+}
+function linearCollisionCheck(line,rect){
+    for(var i = 0; i < line.linePoints.length; i++){
+        if(collisionCheck(line.linePoints[i],rect)){
+            return true;
         }
     }
 }
