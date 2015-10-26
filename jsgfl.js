@@ -25,8 +25,7 @@ function line(initX,initY,finalX,finalY){
     for(var i = 0; i < Math.floor(this.lineLength); i++){
         this.linePoints[i] = new point((this.xi + (this.xDelta / this.lineLength * i)),(this.yi + (this.yDelta / this.lineLength * i)));
     }
-}//draws all lines not a specific line
-//needs to be reworked
+}
 function drawLine(line,width,color){
     ctx.strokeStyle = color;
     ctx.lineWidth = width;
