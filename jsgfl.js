@@ -2,6 +2,23 @@
 	Author Silas Rex
 	didnt keep track of versions :P
 */
+function rangeCheck(test, target, range){
+    var rangeLength = (target + range) - (target - range)
+    if(test == target){
+        return true;
+    }else{
+        for(var i = 0; i < rangeLength; i++){
+            if(test == target+range - i){
+                return true;
+            }else{
+                if(i == rangeLength - 1){
+                    return false;
+                }
+            }
+        }
+    }
+
+}
 function drawString(string,font,x,y,color){
     ctx.fillStyle = color;
     ctx.font = font;
@@ -109,6 +126,7 @@ function drawAnimatedImage(data){
         data.width,
         data.height);
 }
+
 function imageCenterRotate(rect,deg,drawFun){
     var rad = deg * Math.PI / 180;
     var deltaX = rect.x + rect.width/2,
@@ -259,6 +277,7 @@ function mapShow(map,lvl){
         imageShow(map.map[i]);
     }
 }
+//needs to be modified oct 28, 2015
 function mapScroller(game,lS,dS,rS,uS){
     var arrayL = game.map.mapWidth * game.map.mapHeight;
     if(game.player.up){
