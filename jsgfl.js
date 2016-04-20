@@ -3,21 +3,30 @@
 	didnt keep track of versions :P
 */
 function rangeCheck(test, target, range){
-    var rangeLength = (target + range) - (target - range)
     if(test == target){
         return true;
+    }else if(Math.abs(test - target) < range){
+        return true;
     }else{
-        for(var i = 0; i < rangeLength; i++){
-            if(test == target+range - i){
-                return true;
-            }else{
-                if(i == rangeLength - 1){
-                    return false;
-                }
-            }
-        }
+       return false;
     }
-
+}
+function ticker(counter, frequency, maxTicks){
+    this.frame = counter;
+    this.freq = frequency;
+    this.maxTicks = maxTicks;
+    this.tick = false;
+}
+function run(tickCounter){
+    tickCounter.frame += 1;
+    if(tickCounter.frame % tickCounter.freq == 0){
+        tickCounter.tick = true;
+    }else{
+        tickCounter.tick = false;
+    }
+    if(tickCounter.frame >= tickCounter.maxTicks){
+        tickCounter.frame -= tickCounter.maxTicks;
+    }
 }
 function drawString(string,font,x,y,color){
     ctx.fillStyle = color;
@@ -50,6 +59,20 @@ function drawLine(line,width,color){
     ctx.moveTo(line.xi,line.yi);
     ctx.lineTo(line.xf,line.yf);
     ctx.stroke();
+}
+function circleMngr(x,y,radius,fill,stroke,draw,id){
+    this.type = "circle";
+    this.id = id;
+    this.x = x;
+    this.y = y;
+    this.width = radius * 2;
+    this.height = radius * 2;
+    this.radius = radius;
+    this.fill = fill;
+    this.stroke = stroke;
+    this.visible = true;
+    this.draw = draw;
+    this.deg = 0;
 }
 function rectMngr(x,y,width,height,color,id){
     this.type = "rect";
@@ -104,6 +127,26 @@ function animationData(x,y,width,height,IW,IH,src,id){
     this.up = false;
     this.deg = 0;
 }
+function drawCircle(data){
+    ctx.fillStyle = data.fill;
+    ctx.strokeStyle = data.stroke;
+    ctx.beginPath();
+    ctx.arc(data.x,
+        data.y,
+        data.radius,
+        0,
+        2 * Math.PI);
+    if(data.draw == 1){
+        ctx.stroke();
+    }
+    else if(data.draw == 2){
+        ctx.fill();
+    }
+    else if(data.draw == 3){
+      ctx.fill();
+      ctx.stroke();
+    }
+}
 function drawNormalImage(data){
     ctx.drawImage(data.sprite,
         data.x,
@@ -126,7 +169,24 @@ function drawAnimatedImage(data){
         data.width,
         data.height);
 }
-
+function colorChange(image,tR,tG,tB,range,nR,nG,nB){
+    var info = ctx.getImageData(0,0,c.width,c.height);
+    var pixAr = info.data;
+    var cR, cG, cB;
+    for(var i = 0; i < pixAr.length; i += 4){
+        cR = pixAr[i];
+        cG = pixAr[i + 1];
+        cB = pixAr[i + 2];
+        if(rangeCheck(cR,tR,range) &&
+           rangeCheck(cG,tG,range) &&
+           rangeCheck(cB,tB,range)){
+             pixAr[i] = nR;
+             pixAr[i + 1] = nG;
+             pixAr[i + 2] = nB;
+        }
+    }
+    ctx.putImageData(info,0,0);
+}
 function imageCenterRotate(rect,deg,drawFun){
     var rad = deg * Math.PI / 180;
     var deltaX = rect.x + rect.width/2,
@@ -161,6 +221,9 @@ function imageShow(data){
         }
         else if(data.type === "rect"){
             imageCenterRotate(data,data.deg,drawNormalRect);
+        }
+        else if (data.type === "circle"){
+            imageCenterRotate(data,data.deg,drawCircle);
         }
     }
 }
